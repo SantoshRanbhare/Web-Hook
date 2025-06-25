@@ -55,6 +55,5 @@ public class WebhookController {
         WebhookMapping saved = repository.save(mapping);
         return ResponseEntity.status(HttpStatus.CREATED).body(saved);
     }
-
 }
 
