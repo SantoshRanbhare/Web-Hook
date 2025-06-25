@@ -7,5 +7,6 @@ import java.util.Optional;
 
 public interface WebhookMappingRepository extends JpaRepository<WebhookMapping, Long> {
     Optional<WebhookMapping> findBySourceIgnoreCase(String source);
+    
 }
 
