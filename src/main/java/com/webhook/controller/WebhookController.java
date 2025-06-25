@@ -45,7 +45,6 @@ public class WebhookController {
                 .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND)
                         .body("No destination URL found for source: " + source));
     }
-
     @PostMapping("/add")
     public ResponseEntity<?> addMapping(@RequestBody WebhookMapping mapping) {
         // Check if source already exists
