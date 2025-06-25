@@ -45,7 +45,7 @@ public class WebhookController {
                 .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND)
                         .body("No destination URL found for source: " + source));
     }
-    
+
     @PostMapping("/add")
     public ResponseEntity<?> addMapping(@RequestBody WebhookMapping mapping) {
         // Check if source already exists
@@ -56,6 +56,42 @@ public class WebhookController {
         WebhookMapping saved = repository.save(mapping);
         return ResponseEntity.status(HttpStatus.CREATED).body(saved);
     }
-    
+
+    @GetMapping("/meta")
+    public ResponseEntity<String> verifyWebhook(@RequestParam("hub.mode") String mode,
+                                                @RequestParam("hub.challenge") String challenge,
+                                                @RequestParam("hub.verify_token") String token) {
+        if ("subscribe".equals(mode) && "my_secret_token".equals(token)) {
+            return ResponseEntity.ok(challenge);
+        } else {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Verification failed");
+        }
+    }
+
+    @PostMapping("/meta")
+    public ResponseEntity<String> handleMetaWebhook(@RequestBody String payload) {
+        System.out.println("📩 Received Meta webhook payload:");
+        System.out.println(payload);
+
+        // Forward to mock backend
+        String destinationUrl = "http://localhost:8081/backend/meta"; // Change port if needed
+        try {
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            HttpEntity<String> request = new HttpEntity<>(payload, headers);
+
+            ResponseEntity<String> response =
+                    restTemplate.postForEntity(destinationUrl, request, String.class);
+
+            System.out.println("➡️ Forwarded to mock backend at: " + destinationUrl);
+            return ResponseEntity.ok("✅ Forwarded to mock backend: " + response.getStatusCode());
+        } catch (Exception e) {
+            System.err.println("❌ Error forwarding to mock backend: " + e.getMessage());
+            return ResponseEntity.status(500).body("Forwarding failed");
+        }
+    }
+
+
+
 }
 
