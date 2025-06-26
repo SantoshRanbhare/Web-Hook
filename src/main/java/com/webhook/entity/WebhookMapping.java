@@ -9,7 +9,6 @@ import lombok.*;
 @AllArgsConstructor
 @Table(name = "webhook_mapping")
 public class WebhookMapping {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
